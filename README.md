@@ -3,7 +3,7 @@
 A clipping plugin, with high resolution wave visualization for precise mixing/mastering work.
 
 Why?
-> Most contemporary clipping plugins for this use case (source: about 10 minutes of googling) 
+> Most contemporary clipping plugins for this use case (source: about 10 minutes of googling, some hours trying various options) either do not visualize or do not visualize with sufficient resolution. I want to be able to see the effects of clipping sample-by-sample, in an oscilloscope with some control over zoom and syncing.
 
 ## Tools
 
