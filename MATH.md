@@ -5,7 +5,7 @@ So as not to clutter README, here's where I'll keep my notes on the theory.
 ## The approach to soft clipping
 
 ### Background
-- hard clipping is simple because it just takes $\operatorname{clamp}(x, -1, 1)$.
+- hard clipping is simple because it just takes $\text{clamp}(x, -1, 1)$.
   - clip visualization is easy - anything over 0db is clipping.
   - until the clipping threshold, the output is identity (i.e. for $0\leq x <1, f(x) = x$)
 
@@ -21,12 +21,12 @@ So, let's identify some conditions that will make for good soft clipping respect
 0. $f(-x) = -f(x)$ (definition of odd function; $f$ is not asymmetrical and only adds odd harmonics)
 1. $f'(x) > 0$ for $|x| < L$ ($f$ is increasing, except perhaps at and beyond the saturation points where it flattens to 0)
 2. $f'(0) = 1$ ($f$ behaves like the identity in the neighborhood of 0)
-3. $\operatorname{Image}(f) = [-1, 1]$ (the clipped signal is no greater than 0db)
+3. $\text{Image}(f) = [-1, 1]$ (the clipped signal is no greater than 0db)
 4. $x|f''(x)| < 0$ (equivalently, $f(x)$ is concave down for $x>0$ and concave up for $x<0$; the saturation curve is sigmoid-shaped
 
 To summarize, $f$ should be odd, look like a sigmoid or a familiar soft saturation curve, and fully saturate at and above $L$, but additionally behave like the identity function for quiet signals and exhibit more apparent saturation the more you push it. 
 
-Conjuring images of such classes of functions ($\operatorname{erf}$, $\tanh$, smoothstep), and then thinking about what their derivatives look like (normal distribution, $\operatorname{sech}^2$, inverted parabola), one notices that the derivatives are generally bell curves. We can select bell curves that cap out at 1, are nonnegative, and similarly adhere to the desired properties, and then take an integral.
+Conjuring images of such classes of functions ($\text{erf}$, $\tanh$, smoothstep), and then thinking about what their derivatives look like (normal distribution, $\text{sech}^2$, inverted parabola), one notices that the derivatives are generally bell curves. We can select bell curves that cap out at 1, are nonnegative, and similarly adhere to the desired properties, and then take an integral.
 
 ### Examples
 
@@ -35,7 +35,7 @@ Here are some examples I was able to come up with goofing around in desmos and s
 0. Hard clip, for reference: ($L=1$, class $C^0$)
 
     $ f(x) 
-    = \operatorname{clamp}(x, -1, 1) 
+    = \text{clamp}(x, -1, 1) 
     = \begin{cases}
     -1  & x<-1 \\ 
     x   & -1 \leq x \leq 1 \\ 
@@ -58,7 +58,7 @@ Here are some examples I was able to come up with goofing around in desmos and s
 
 3. Error function (ditto)
 
-    $ f(x) = \operatorname{erf}(\frac{x\sqrt{\pi}}{2})$
+    $ f(x) = \text{erf}(\frac{x\sqrt{\pi}}{2})$
 
 4. The "Cambridge Bloater" (based on a plugin hated for its iLok requirement. $L=2$, class $C^1$)
 
@@ -74,26 +74,46 @@ Here are some examples I was able to come up with goofing around in desmos and s
 5. "How hard can getting $C^2$ smoothness be"
 
     Constraints:
-    $$
+
+    $
     f'(0) = 1 \\
     f(L) = 1 \\
     f'(L) = 0 \\
     f''(L) = 0
-    $$
+    $
+
     Let
-    $$
+
+    $
     f(x) = a_0 + a_1x^1 + a_2x^2 + a_3x^3 + a_4x^4 + a_5x^5 + a_6x^6 + a_7x^7
-    $$
+    $
+
     But we want $f$ odd, so $a_0 = a_2 = a_4 = a_6 = 0$. $f'(0) = 1$ immediately yields $a_1 = 1$. Computing derivatives of $f$ and applying the remaining constraints we get:
-    $$
+
+    $
     L+a_3L^3+a_5L^5+a_7L^7=1 \\
     1+3a_3L^2+5a_5L^4+7a_7L^6=0 \\
     6a_3L+20a_5L^3+42a_7L^5=0
-    $$ \
+    $
+
     which is a system of three linear equations in three unknowns ($a_3, a_5, a_7$). Solve, for example with $L=2$, to obtain
-    $$
+
+    $
     f(x) = x - \frac{13}{64}x^3 + \frac{3}{128}x^5 - \frac{1}{1024}x^7
-    $$
+    $
+    
     Since $f'(L) = f''(L) = 0$, and after clamping $f(x)$ is constant for $x>L$, $f$ is $C^2$ at the saturation points. Elsewhere, $f$ is trivially $C^{\infty}$. Verification of the constraints by computing the derivatives of $f$ is left as an exercise for the reader.
 
     Maybe I'm getting a little sentimental because I spent so much time putting pencil to paper for this one, but I feel like it would be a nice flagship soft clipping curve for the plugin.
+
+6. Can we get $C^\infty$ with finite $L$?
+
+    Yes.
+
+    While thinking pretty hard about this one and leafing through articles on smoothness and continuity, I accidentally came across the identity theorem for analytic functions.
+    > If $f$ and $g$ are analytic with domain $\mathbb{R}$ and $f = g$ on $S \in \mathbb{R}$ and $S$ contains an accumulation point. Then $f = g$ on all of $\mathbb{R}$.
+    
+    At the time I was trying to rigorously cement an sneaking intuition that "simpler" functions wouldn't be able to exhibit $C^\infty$ and finite saturation points at the same time. But with this theorem, it becomes easy to see.
+    > We want $f(x) = 1$ for $|x| \geq L$, and $f \in C^\infty$. Let $g(x) = 1$, a constant function. Then $f(x) = g(x)$ for all $x \geq L$. If $f$ were analytic, then $f(x) = g(x) = 1$ on all of $\mathbb{R}$. Not what we want at all! So, $f$ must be non-analytic.
+
+    There are a few examples of infinitely differentiable non-analytic functions. One that sticks out to me is the Fabius function; it would take some translation and scaling, but it at least appears to me to have a softer knee than anything I've looked at thus far. I could try and bound the rate of decrease of some of these functions and compare, but it's getting late. I'm just leaving a note here to examine the Fabius function and see if it would be feasible to implement as a saturation curve. It doesn't have a closed form expression, but maybe we could precompute a lookup table.
