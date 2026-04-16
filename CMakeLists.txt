@@ -31,6 +31,8 @@ target_sources(Scalpel
         Source/PluginProcessor.h
         Source/PluginEditor.cpp
         Source/PluginEditor.h
+        Source/WaveformDisplay.cpp
+        Source/WaveformDisplay.h
 )
 
 # Compile definitions

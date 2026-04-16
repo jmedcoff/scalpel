@@ -33,12 +33,16 @@ cmake --build build --config Release
 
 ### Done:
 - Project setup
+- MVP: basic features
+  - waveform visualizer drawing
+  - hard clipper with input gain and output gain knobs, and "link" button which forces $gain_{out} = -gain_{in}$
+  - window control: if synced, buttons let you choose a window size of (1/4, 1/2, 1, 2, 4, 8) measures; if free, a slider lets you dial a window size between 100 and 10000 milliseconds
+
 
 ### To do:
 - MVP: basic features
-  - waveform visualizer - free or synced to DAW, uses left/right/mid input
-  - hard clipper with input gain and output gain knobs, and "link" button which forces $gain_{out} = -gain_{in}$
-  - window control: if synced, buttons let you choose a window size of (1/4, 1/2, 1, 2, 4, 8) measures; if free, a slider lets you dial a window size between 100 and 10000 milliseconds
+  - waveform visualizer - syncing needs to be changed to "paged" operation; i.e. the input is painted left to right on screen rather than the wave itself scrolling
+  - waveform visualizer - fix clip visualization
 - v2: improved visualization
   - RGB waveform display, like rekordbox or minimeters
   - clipping indication with distinct color
@@ -49,7 +53,7 @@ cmake --build build --config Release
   - selectable clipping algorithms including soft saturation
   - add UI knob for soft saturation parameter
   - oversampling up to 16x
-  - TBD?
+- TBD?
 
 ## License
 
